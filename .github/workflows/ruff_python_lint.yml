@@ -1,0 +1,35 @@
+name: Ruff Lint
+
+on: 
+  workflow_call:
+    inputs:
+      validate_all_codebase:
+        description: "To lint the whole package/repository or just a new/updated file."
+        required: false
+        default: false
+        type: boolean
+    secrets:
+      token:
+        required: true
+
+jobs:
+  ruff-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.token }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Run Ruff
+        run: ruff check . --output-format=github
+
