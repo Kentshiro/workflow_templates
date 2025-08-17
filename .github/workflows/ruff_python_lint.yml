@@ -1,0 +1,76 @@
+---
+name: Ruff Lint
+
+# Start Workflow
+on: 
+  workflow_call:
+    inputs:
+      validate_all_codebase:
+        description: "To lint the whole package/repository or just a new/updated file."
+        required: false
+        default: false
+        type: boolean
+      filter_regex_exclude:
+        description: "Expression defining which files will be excluded from linting."
+        required: false
+        default: (__pycache__|.*\.pyc)
+        type: string
+      filter_regex_include:
+        description: "Expression defining which files will be processed by linters"
+        required: false
+        default: (.*\.py|.*\.json|.*\.txt|.*\.yaml)
+        type: string
+      ignore_generated_files:
+        description: "If True, super-linter will ignore all the files with @generated marker but without @not-generated marker."
+        required: false
+        default: true
+        type: boolean
+      ignore_gitignored_files:
+        description: "If True, super-linter will ignore all the files that are ignored by Git."
+        required: false
+        default: true
+        type: boolean
+      validate_jscpd:
+        description: "Flag to enable or disable the JSCPD."
+        required: false
+        default: false
+        type: boolean
+      validate_python_isort:
+        description: "Flag to enable or disable the isort linter."
+        required: false
+        default: false
+        type: boolean
+      default_branch:
+        description: "The name of the repository default branch."
+        required: false
+        default: main
+        type: string
+      linters_config_ref:
+        description: "Git ref from which to download the linters conf files."
+        required: false
+        default: "main"
+        type: string
+#    secrets:
+#      workflow_template_token:
+#        description: Token with permission to read contents in the workflow-templates repo
+#        required: true
+
+jobs:
+  lint:
+    name: Ruff Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Run Ruff
+        run: ruff check . --output-format=github
